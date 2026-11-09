@@ -7,7 +7,8 @@ import {
   toggleFault, toggleMystery, toggleScenario, totalSteps, withApp,
 } from "../../web/dev-core.mjs";
 import {
-  GATES, bitsToNumber, matchesGoal, numberToBits, numberToChar, sumText,
+  GATES, RACE_LOCK_MS, RACE_SECONDS, STEPS, bitsToNumber, laptopCounted, matchesGoal, newRace,
+  numberToBits, numberToChar, pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
 } from "../../web/computer-core.mjs";
 
 const route = (state) => {
@@ -177,4 +178,52 @@ test("gates follow their truth tables", () => {
   const table = [[false, false], [false, true], [true, false], [true, true]];
   assert.deepEqual(table.map(([a, b]) => GATES.and(a, b)), [false, false, false, true]);
   assert.deepEqual(table.map(([a, b]) => GATES.or(a, b)), [false, true, true, true]);
+});
+
+test("the race comes after the gates and before the closing line", () => {
+  assert.deepEqual(STEPS, ["binary", "gates", "race", "close"]);
+});
+
+test("the race clock starts at the first press, and late presses don't count", () => {
+  let race = pressSpace(newRace(), 1000);
+  assert.equal(race.phase, "running");
+  assert.equal(race.you, 1);
+  assert.equal(secondsLeft(race, 1000), RACE_SECONDS);
+  assert.equal(secondsLeft(race, 3500), RACE_SECONDS - 2.5);
+  race = pressSpace(race, 1000 + RACE_SECONDS * 1000 - 1);
+  assert.equal(race.you, 2);
+  race = pressSpace(race, 1000 + RACE_SECONDS * 1000);
+  assert.equal(race.you, 2);
+  assert.equal(secondsLeft(race, 1000 + RACE_SECONDS * 1000 + 50), 0);
+});
+
+test("the race ends only when the laptop says it is done", () => {
+  let race = pressSpace(newRace(), 0);
+  race = laptopCounted(race, 1_000_000, false, 100);
+  assert.equal(race.phase, "running");
+  assert.equal(race.laptop, 1_000_000);
+  race = laptopCounted(race, 5_000_000_000, true, 5020);
+  assert.equal(race.phase, "done");
+  assert.equal(race.laptop, 5_000_000_000);
+  assert.equal(secondsLeft(race, 5020), 0);
+  assert.deepEqual(laptopCounted(race, 1, false, 6000), race, "a finished race keeps its result");
+  assert.deepEqual(laptopCounted(newRace(), 1, true, 0), newRace(), "a race that hasn't started ignores the laptop");
+});
+
+test("Space shows the result for a moment before moving on", () => {
+  const done = laptopCounted(pressSpace(newRace(), 0), 5e9, true, 5000);
+  assert.ok(!spaceMovesOn(done, 5000 + RACE_LOCK_MS - 1));
+  assert.deepEqual(pressSpace(done, 5000 + 100), done, "a late press leaves the result alone");
+  assert.ok(spaceMovesOn(done, 5000 + RACE_LOCK_MS));
+  assert.ok(!spaceMovesOn(newRace(), 1e9));
+  assert.ok(!spaceMovesOn(pressSpace(newRace(), 0), 1e9));
+});
+
+test("how much faster the laptop was reads naturally", () => {
+  assert.equal(timesFaster(40, 5e9), "125 million");
+  assert.equal(timesFaster(50, 4.8e9), "96 million");
+  assert.equal(timesFaster(700, 4.8e9), "6.9 million");
+  assert.equal(timesFaster(3, 5e9), "1.7 billion");
+  assert.equal(timesFaster(1, 5e9), "5 billion");
+  assert.equal(timesFaster(10, 25_000), "2,500");
 });

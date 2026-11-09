@@ -95,7 +95,7 @@
       <div class="computer-steps">
         <span class="stage" data-step="binary">1. Only 0s and 1s</span>
         <span class="stage" data-step="gates">2. Making decisions</span>
-        <span class="stage" data-step="close">3. The whole machine</span>
+        <span class="stage" data-step="race close">3. The whole machine</span>
       </div>
 
       <div id="binary-step" class="computer-body">
@@ -125,6 +125,27 @@
         </div>
       </div>
 
+      <div id="race-step" class="computer-body" hidden>
+        <div class="race-heading">
+          <p id="race-title" class="goal"></p>
+          <p id="race-hint" class="race-hint"></p>
+        </div>
+        <div class="race-clock">
+          <div class="race-timer"><div id="race-timer-fill" class="race-timer-fill"></div></div>
+          <span id="race-seconds" class="race-seconds"></span>
+        </div>
+        <div class="race-scores">
+          <div class="result-card race-card">
+            <span class="result-label">You</span>
+            <span id="race-you" class="race-number"></span>
+          </div>
+          <div class="result-card race-card laptop">
+            <span class="result-label">This laptop</span>
+            <span id="race-laptop" class="race-number"></span>
+          </div>
+        </div>
+      </div>
+
       <div id="close-step" class="computer-body close-body" hidden>
         <p class="closing">Billions of these switches make up the chip that just trained the AI and sent your packet.</p>
         <p class="closing-sub">Computer engineers work on all of it, from the switches to the software.</p>
@@ -134,6 +155,7 @@
         <button id="computer-next" class="key-button primary"><kbd>Space</kbd>Next</button>
         <button id="computer-back" class="key-button"><kbd>&larr;</kbd>Back</button>
         <button id="computer-reset" class="key-button"><kbd>0</kbd>All switches off</button>
+        <button id="race-again" class="key-button" hidden><kbd>R</kbd>Race again</button>
         <span id="computer-note" class="key-note">Press any letter to set the goal</span>
       </footer>
     </section>

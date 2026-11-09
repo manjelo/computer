@@ -541,6 +541,20 @@ main { flex: 1; min-height: 0; display: flex; }
 .gate-lamp.on { fill: var(--lit); stroke: #a87400; }
 .gate-result { fill: var(--ink); font-family: var(--font); font-size: 26px; font-weight: 700; text-anchor: middle; }
 
+.race-heading { display: flex; flex-direction: column; gap: 0.8rem; text-align: center; }
+.goal.race-won { color: var(--signal); }
+.race-hint { min-height: 1.3em; font-size: 1.9rem; color: var(--ink-soft); }
+
+.race-clock { display: flex; align-items: center; gap: 1.2rem; }
+.race-timer { flex: 1; height: 1.2rem; overflow: hidden; border-radius: 0.6rem; background: var(--blue-soft); }
+.race-timer-fill { width: 100%; height: 100%; background: var(--blue); transform-origin: left; }
+.race-seconds { min-width: 6rem; font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+
+.race-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.race-card { align-items: center; min-height: 14rem; }
+.race-number { font-size: 4.6rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.race-card.laptop .race-number { color: var(--signal); }
+
 .close-body { align-items: center; justify-content: center; gap: 2rem; text-align: center; }
 .closing { max-width: 62rem; font-size: 3.6rem; font-weight: 800; line-height: 1.18; color: var(--blue); }
 .closing-sub { font-size: 1.9rem; color: var(--ink-soft); }

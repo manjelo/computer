@@ -1,5 +1,6 @@
 import {
-  GATES, PLACES, STEPS, bitsToNumber, matchesGoal, numberToChar, sumText,
+  GATES, PLACES, RACE_SECONDS, STEPS, bitsToNumber, laptopCounted, matchesGoal, newRace,
+  numberToChar, pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
 } from "./computer-core.mjs";
 
 const NS = "http://www.w3.org/2000/svg";
@@ -135,19 +136,102 @@ export function createComputerTrack() {
 
   const resetGates = [createGate("and"), createGate("or")];
 
+  // Race the computer: the student presses Space while a worker counts on one part of the chip.
+  const raceTitle = document.getElementById("race-title");
+  const raceHint = document.getElementById("race-hint");
+  const raceFill = document.getElementById("race-timer-fill");
+  const raceSeconds = document.getElementById("race-seconds");
+  const raceYou = document.getElementById("race-you");
+  const raceLaptop = document.getElementById("race-laptop");
+  const raceAgain = document.getElementById("race-again");
+  let race = newRace();
+  let worker = null;
+  let clockFrame = null;
+
+  const RACE_HINTS = {
+    ready: "Press Space as fast as you can. The clock starts at your first press.",
+    running: "Keep pressing!",
+    done: "It did that with just one part of its chip.",
+  };
+
+  function renderClock() {
+    const left = secondsLeft(race, performance.now());
+    raceFill.style.transform = `scaleX(${left / RACE_SECONDS})`;
+    raceSeconds.textContent = `${left.toFixed(1)} s`;
+  }
+
+  function renderRace() {
+    const done = race.phase === "done";
+    raceTitle.textContent = done
+      ? `The laptop counted ${timesFaster(race.you, race.laptop)} times faster`
+      : `Who can count faster in ${RACE_SECONDS} seconds?`;
+    raceTitle.classList.toggle("race-won", done);
+    raceHint.textContent = RACE_HINTS[race.phase];
+    raceYou.textContent = race.you.toLocaleString("en");
+    raceLaptop.textContent = race.laptop.toLocaleString("en");
+    renderClock();
+  }
+
+  function tickClock() {
+    renderClock();
+    if (race.phase === "running") clockFrame = requestAnimationFrame(tickClock);
+  }
+
+  function stopLaptop() {
+    worker?.terminate();
+    worker = null;
+    cancelAnimationFrame(clockFrame);
+  }
+
+  // The counting runs in a worker, so the page stays free to catch every key press.
+  function startLaptop() {
+    worker = new Worker("/web/race-worker.js");
+    worker.onmessage = ({ data }) => {
+      race = laptopCounted(race, data.count, data.done, performance.now());
+      if (data.done) stopLaptop();
+      renderRace();
+    };
+    worker.postMessage({ ms: RACE_SECONDS * 1000 });
+    clockFrame = requestAnimationFrame(tickClock);
+  }
+
+  function resetRace() {
+    stopLaptop();
+    race = newRace();
+    renderRace();
+  }
+
+  function spaceInRace() {
+    const now = performance.now();
+    if (spaceMovesOn(race, now)) {
+      move(1);
+      return;
+    }
+    const wasReady = race.phase === "ready";
+    race = pressSpace(race, now);
+    if (wasReady) startLaptop();
+    renderRace();
+  }
+
   function renderStep() {
     const name = STEPS[step];
-    document.getElementById("binary-step").hidden = name !== "binary";
-    document.getElementById("gates-step").hidden = name !== "gates";
-    document.getElementById("close-step").hidden = name !== "close";
+    for (const other of STEPS) document.getElementById(`${other}-step`).hidden = other !== name;
     document.getElementById("computer-note").hidden = name !== "binary";
+    raceAgain.hidden = name !== "race";
     for (const pill of document.querySelectorAll(".computer-steps .stage")) {
-      pill.classList.toggle("active", pill.dataset.step === name);
+      pill.classList.toggle("active", pill.dataset.step.split(" ").includes(name));
     }
   }
 
   function move(delta) {
+    const from = STEPS[step];
     step = Math.max(0, Math.min(STEPS.length - 1, step + delta));
+    const to = STEPS[step];
+    // Leaving mid-race calls it off. Arriving from the gates always starts a fresh race,
+    // while coming back from the closing line keeps the result.
+    if ((from === "race" && to !== "race" && race.phase === "running") || (from === "gates" && to === "race")) {
+      resetRace();
+    }
     renderStep();
   }
 
@@ -155,22 +239,28 @@ export function createComputerTrack() {
     bits = PLACES.map(() => 0);
     goal = null;
     resetGates.forEach((reset) => reset());
+    resetRace();
     renderBinary();
   }
 
   document.getElementById("computer-next").addEventListener("click", () => move(1));
   document.getElementById("computer-back").addEventListener("click", () => move(-1));
   document.getElementById("computer-reset").addEventListener("click", resetAll);
+  raceAgain.addEventListener("click", resetRace);
 
   renderBinary();
+  renderRace();
   renderStep();
 
   return {
     onKey(key) {
-      if (key === " " || key === "ArrowRight") move(1);
+      const name = STEPS[step];
+      if (name === "race" && key === " ") spaceInRace();
+      else if (key === " " || key === "ArrowRight") move(1);
       else if (key === "ArrowLeft") move(-1);
       else if (key === "0") resetAll();
-      else if (STEPS[step] === "binary" && /^[a-zA-Z]$/.test(key)) {
+      else if (name === "race" && key.toLowerCase() === "r") resetRace();
+      else if (name === "binary" && /^[a-zA-Z]$/.test(key)) {
         goal = key.toUpperCase();
         bits = PLACES.map(() => 0);
         renderBinary();

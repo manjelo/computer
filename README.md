@@ -28,9 +28,10 @@ Switch tracks with `1`, `2` and `3`.
 | | `H` | Rush hour: the server overloads, then engineers add servers |
 | | `D` / `B` | Break DNS / the database on purpose (keys only, no button) |
 | **How a computer works** | any letter | Set the goal letter, such as the first letter of a student's name |
-| | `Space` or `→` | Next step |
+| | `Space` or `→` | Next step. In the race, `Space` is the student's key and `→` skips the race |
 | | `←` | Back |
-| | `0` | All switches off |
+| | `R` | Race again, for the next student |
+| | `0` | All switches off, and a fresh race |
 
 In Development, each scenario key switches that scenario on, and pressing it again switches it off. Only one scenario runs at a time, and the app you picked stays the same.
 
@@ -45,7 +46,7 @@ In Development, each scenario key switches that scenario on, and pressing it aga
 - **Logged out:** press `L`. The API gateway sends the request back and the phone shows a login screen.
 - **Rush hour:** press `H`, then `Space`. Requests pour in until the server is busy and they queue up. Ask how they'd fix it, then press `Space` to add servers.
 
-**How a computer works.** Ask for the first letter of a student's name and press that key. They click the switches until the letter matches. Press `Space` for the gates, where they click the inputs, then `Space` for the closing line.
+**How a computer works.** Ask for the first letter of a student's name and press that key. They click the switches until the letter matches. Press `Space` for the gates, where they click the inputs, then `Space` for the race against the laptop. The student presses `Space` as fast as they can. The 5-second clock starts at their first press, and the laptop counts on one part of its chip at the same time. The result stays up, and `Space` does nothing for 2 seconds so a student still pressing can't skip it. Press `R` for another student, or `Space` for the closing line.
 
 ## Before the event: improve the model with real drawings
 
