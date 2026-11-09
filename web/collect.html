@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Drawings</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" style="padding:1rem 0">Team drawings, before the event only</div>
+  </header>
+  <main>
+    <div class="collect">
+      <div class="panel draw-panel">
+        <p id="prompt" class="collect-prompt"></p>
+        <canvas id="canvas" class="draw-canvas" width="512" height="512" aria-label="Drawing area"></canvas>
+      </div>
+      <div class="collect-side">
+        <div class="panel collect-side">
+          <h2>Saved so far</h2>
+          <div id="counts"></div>
+          <p class="collect-note">Aim for at least 40 of each, from several people. One in five is kept back to test the model.</p>
+        </div>
+        <button id="save" class="key-button primary"><kbd>Enter</kbd>Save and next</button>
+        <button id="clear" class="key-button"><kbd>C</kbd>Clear</button>
+        <p id="message" class="connection" hidden></p>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import { attachPen } from "/web/draw.js";
+
+    const SHAPES = ["circle", "square", "triangle"];
+    const prompt = document.getElementById("prompt");
+    const countsRoot = document.getElementById("counts");
+    const message = document.getElementById("message");
+    const pen = attachPen(document.getElementById("canvas"), { onStroke() {} });
+    let turn = 0;
+
+    function showCounts(counts) {
+      countsRoot.replaceChildren(...SHAPES.map((shape) => {
+        const row = document.createElement("div");
+        row.className = "collect-count";
+        row.innerHTML = `<span>${shape}</span><strong>${counts[shape]}</strong>`;
+        return row;
+      }));
+    }
+
+    function showPrompt() {
+      prompt.textContent = `Draw a ${SHAPES[turn % SHAPES.length]} with the mouse`;
+    }
+
+    async function save() {
+      const response = await fetch(`/api/collect/${SHAPES[turn % SHAPES.length]}`, {
+        method: "POST",
+        body: await pen.toPng(),
+      });
+      message.hidden = response.ok;
+      if (!response.ok) {
+        message.textContent = "Draw the shape first.";
+        return;
+      }
+      showCounts(await response.json());
+      pen.clear();
+      turn++;
+      showPrompt();
+    }
+
+    document.getElementById("save").addEventListener("click", save);
+    document.getElementById("clear").addEventListener("click", () => pen.clear());
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); save(); }
+      if (event.key.toLowerCase() === "c") pen.clear();
+    });
+
+    showPrompt();
+    fetch("/api/collect/counts").then((response) => response.json()).then(showCounts);
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Computer Engineering</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Computer Engineering</div>
+    <nav class="tabs" aria-label="Tracks">
+      <button class="tab" data-tab="ai"><kbd>1</kbd>AI</button>
+      <button class="tab" data-tab="dev"><kbd>2</kbd>Development</button>
+      <button class="tab" data-tab="computer"><kbd>3</kbd>How a computer works</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="ai" class="track ai" hidden>
+      <div class="ai-stages" aria-label="Training stage">
+        <span class="stage" data-stage="untrained">Knows nothing</span>
+        <span class="stage" data-stage="training">Learning</span>
+        <span class="stage" data-stage="trained">Trained</span>
+      </div>
+
+      <div class="ai-grid">
+        <div class="panel draw-panel">
+          <h2>Draw a circle, square or triangle</h2>
+          <canvas id="ai-canvas" class="draw-canvas" width="512" height="512" aria-label="Drawing area"></canvas>
+          <p class="hint"><button id="ai-clear" class="linkish">Clear</button></p>
+        </div>
+
+        <div class="panel guess-panel">
+          <h2>What the model thinks</h2>
+          <p id="ai-verdict" class="verdict">Waiting for a drawing</p>
+          <div id="ai-bars" class="bars"></div>
+        </div>
+
+        <div class="panel train-panel">
+          <div class="train-head">
+            <h2>Accuracy</h2>
+            <div class="train-numbers">
+              <span id="ai-accuracy" class="big-number">33%</span>
+              <span id="ai-progress" class="progress-text">Not trained yet</span>
+            </div>
+          </div>
+          <svg id="ai-chart" class="chart" viewBox="0 0 600 400" role="img" aria-label="Accuracy after each training pass"></svg>
+          <h3>Examples it is learning from, each with its correct label</h3>
+          <div id="ai-samples" class="samples"></div>
+        </div>
+      </div>
+
+      <footer class="keys">
+        <button id="ai-train" class="key-button primary"><kbd>T</kbd>Train</button>
+        <button id="ai-reset" class="key-button"><kbd>R</kbd>New blank model</button>
+        <button id="ai-clear-key" class="key-button"><kbd>C</kbd>Clear drawing</button>
+        <span id="ai-connection" class="connection" hidden>Model not connected. Restart the app.</span>
+      </footer>
+    </section>
+
+    <section id="dev" class="track dev" hidden>
+      <div class="dev-apps" role="group" aria-label="App">
+        <button class="app-chip" data-app="instagram"><kbd>I</kbd>Instagram</button>
+        <button class="app-chip" data-app="youtube"><kbd>Y</kbd>YouTube</button>
+        <button class="app-chip" data-app="game"><kbd>G</kbd>Online game</button>
+      </div>
+      <svg id="dev-map" class="dev-map" viewBox="0 0 1600 620" role="img" aria-label="Path of a request across the internet"></svg>
+      <div class="dev-caption">
+        <div id="dev-progress" class="dev-progress" aria-hidden="true"></div>
+        <div class="dev-caption-body">
+          <div id="dev-count" class="dev-count"></div>
+          <div>
+            <p id="dev-title" class="dev-title"></p>
+            <p id="dev-text" class="dev-text"></p>
+          </div>
+        </div>
+      </div>
+      <footer class="keys">
+        <button id="dev-next" class="key-button primary"><kbd>Space</kbd>Next</button>
+        <button id="dev-back" class="key-button"><kbd>&larr;</kbd>Back</button>
+        <button id="dev-restart" class="key-button"><kbd>R</kbd>Restart</button>
+        <button id="dev-full" class="key-button"><kbd>F</kbd>Real speed</button>
+        <span class="keys-divider" aria-hidden="true"></span>
+        <button class="key-button scenario" data-scenario="again"><kbd>A</kbd>Visit again</button>
+        <button class="key-button scenario" data-scenario="blocked"><kbd>L</kbd>Logged out</button>
+        <button class="key-button scenario" data-scenario="mystery"><kbd>M</kbd>Mystery fault</button>
+        <button class="key-button scenario" data-scenario="rush"><kbd>H</kbd>Rush hour</button>
+        <span id="dev-armed" class="connection" hidden>Fault switched on</span>
+      </footer>
+    </section>
+
+    <section id="computer" class="track computer" hidden>
+      <div class="computer-steps">
+        <span class="stage" data-step="binary">1. Only 0s and 1s</span>
+        <span class="stage" data-step="gates">2. Making decisions</span>
+        <span class="stage" data-step="close">3. The whole machine</span>
+      </div>
+
+      <div id="binary-step" class="computer-body">
+        <p id="binary-goal" class="goal"></p>
+        <div id="binary-switches" class="switches"></div>
+        <div class="binary-result">
+          <div class="result-card">
+            <span class="result-label">The switches say</span>
+            <span id="binary-bits" class="result-mono"></span>
+          </div>
+          <div class="result-card">
+            <span class="result-label">As a number</span>
+            <span id="binary-number" class="result-value"></span>
+            <span id="binary-sum" class="result-sum"></span>
+          </div>
+          <div id="binary-letter-card" class="result-card">
+            <span class="result-label">The letter</span>
+            <span id="binary-letter" class="result-value"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="gates-step" class="computer-body" hidden>
+        <div class="gates">
+          <div id="gate-and" class="gate-card"></div>
+          <div id="gate-or" class="gate-card"></div>
+        </div>
+      </div>
+
+      <div id="close-step" class="computer-body close-body" hidden>
+        <p class="closing">Billions of these switches make up the chip that just trained the AI and sent your packet.</p>
+        <p class="closing-sub">Computer engineers work on all of it, from the switches to the software.</p>
+      </div>
+
+      <footer class="keys">
+        <button id="computer-next" class="key-button primary"><kbd>Space</kbd>Next</button>
+        <button id="computer-back" class="key-button"><kbd>&larr;</kbd>Back</button>
+        <button id="computer-reset" class="key-button"><kbd>0</kbd>All switches off</button>
+        <span id="computer-note" class="key-note">Press any letter to set the goal</span>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="/web/app.js"></script>
+</body>
+</html>

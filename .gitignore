@@ -1,0 +1,16 @@
+# Rebuilt from requirements.txt, see README
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Chrome profile used by the kiosk window
+.browser-profile/
+
+# Tool caches and screenshots
+.playwright-mcp/
+.impeccable/
+
+# LaTeX build files (poster.pdf itself is kept)
+poster/*.aux
+poster/*.log
+poster/*.out

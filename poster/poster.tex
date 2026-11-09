@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage[paperwidth=594mm,paperheight=841mm,margin=0mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc,arrows.meta}
+\usepackage{anyfontsize}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\usepackage[none]{hyphenat}
+
+% Same colours as the event report.
+\definecolor{baublue}{HTML}{1F3A5F}
+\definecolor{baugrey}{HTML}{5A6472}
+\definecolor{signal}{HTML}{D9480F}
+\definecolor{paper}{HTML}{F5F3EC}
+
+\newcommand{\track}[6]{%
+  \node[anchor=north west, fill=white, draw=baublue, line width=1.5mm, rounded corners=8mm,
+        minimum width=530mm, minimum height=150mm] (box#1) at (32mm,#2) {};
+  \node[anchor=north west, text=signal, font=\fontsize{130}{130}\selectfont\bfseries] at ($(box#1.north west)+(14mm,-12mm)$) {#1};
+  \node[anchor=north west, text=baublue, font=\fontsize{82}{92}\selectfont\bfseries] at ($(box#1.north west)+(70mm,-14mm)$) {#3};
+  \node[anchor=north west, text width=440mm, align=left, text=black, font=\fontsize{50}{64}\selectfont] at ($(box#1.north west)+(70mm,-52mm)$) {#4};
+  \node[anchor=north west, text width=440mm, align=left, text=baugrey, font=\fontsize{42}{54}\selectfont] at ($(box#1.north west)+(70mm,-#6)$) {#5};
+}
+
+\begin{document}
+\noindent
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.north west)}, x=1mm, y=1mm]
+  \fill[paper] (0,0) rectangle (594,-841);
+  \fill[baublue] (0,0) rectangle (594,-190);
+  \node[anchor=north west, text=white, font=\fontsize{130}{140}\selectfont\bfseries, text width=540mm, align=left] at (28mm,-26mm) {What is\\Computer Engineering?};
+  \node[anchor=north west, text=white, font=\fontsize{58}{70}\selectfont, text width=540mm, align=left] at (30mm,-142mm) {Building computers, and everything that runs on them.};
+
+  \track{1}{-215mm}{AI}{Teaching machines to learn from examples, instead of telling them every rule.}{Where it's used: voice assistants, medical scans, self-driving cars}{112mm}
+  \track{2}{-385mm}{Development}{Building the apps and systems people use every day, and keeping them running.}{Where it's used: social media, online banking, video games}{112mm}
+  \track{3}{-555mm}{How a computer works}{Designing the chips and circuits that turn 0s and 1s into decisions.}{Where it's used: phones, cars, robots, smart devices}{112mm}
+
+  \fill[baublue] (0,-725) rectangle (594,-841);
+  \node[anchor=center, text=white, font=\fontsize{72}{86}\selectfont\bfseries, text width=530mm, align=center] at (297mm,-765mm) {Try it! Train an AI, follow a packet, or flip the switches.};
+  \node[anchor=center, text=white, font=\fontsize{40}{48}\selectfont] at (297mm,-816mm) {BAU Open Doors 2026 \enspace$\cdot$\enspace Faculty of Engineering, Beirut Arab University};
+\end{tikzpicture}
+\end{document}
