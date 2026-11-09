@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.datastructures import MutableHeaders
 
 from ai.shapes import CLASSES, decode_drawing, has_ink, normalize
 from ai.train import Trainer
@@ -18,8 +19,34 @@ WEB_DIR = ROOT / "web"
 TEAM_DIR = ROOT / "data" / "team"
 
 
+class AlwaysCheckForUpdates:
+    """Tell the browser to check for a newer copy of every file on each load.
+
+    Without this, Chrome guesses how long a file stays fresh and can keep running
+    old scripts for hours after they are edited, even across app restarts. The
+    check costs nothing here: unchanged files come back as a tiny "not modified".
+    Written as plain ASGI so the live training stream is passed through untouched.
+    """
+
+    def __init__(self, app) -> None:
+        self.app = app
+
+    async def __call__(self, scope, receive, send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def send_with_header(message) -> None:
+            if message["type"] == "http.response.start":
+                MutableHeaders(scope=message)["Cache-Control"] = "no-cache"
+            await send(message)
+
+        await self.app(scope, receive, send_with_header)
+
+
 def create_app(trainer: Trainer, team_dir: Path = TEAM_DIR) -> FastAPI:
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    app.add_middleware(AlwaysCheckForUpdates)
 
     @app.get("/")
     def home() -> FileResponse:

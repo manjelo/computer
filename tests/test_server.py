@@ -70,3 +70,15 @@ def test_collect_saves_only_valid_team_drawings(client, tmp_path):
     assert client.post("/api/collect/circle", content=png(draw=False)).status_code == 400
     assert client.post("/api/collect/star", content=png()).status_code == 404
     assert client.get("/api/collect/counts").json() == {"circle": 1, "square": 0, "triangle": 0}
+
+
+@pytest.mark.parametrize("path", ["/", "/web/computer.js", "/api/collect/counts"])
+def test_browser_always_checks_for_a_newer_copy(client, path):
+    response = client.get(path)
+    assert response.headers["cache-control"] == "no-cache"
+
+
+def test_unchanged_files_come_back_as_not_modified(client):
+    first = client.get("/web/computer.js")
+    again = client.get("/web/computer.js", headers={"If-None-Match": first.headers["etag"]})
+    assert again.status_code == 304
