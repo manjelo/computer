@@ -29,7 +29,7 @@ def client(trainer, tmp_path):
 
 
 @pytest.mark.parametrize(
-    "path", ["/", "/collect", "/web/style.css", "/web/app.js", "/web/dev-core.mjs", "/web/race-worker.js"]
+    "path", ["/", "/collect", "/web/style.css", "/web/app.js", "/web/dev-core.mjs", "/web/race-worker.js", "/web/adding.js"]
 )
 def test_pages_and_assets_are_served(client, path):
     assert client.get(path).status_code == 200

@@ -7,9 +7,12 @@ import {
   toggleFault, toggleMystery, toggleScenario, totalSteps, withApp,
 } from "../../web/dev-core.mjs";
 import {
-  GATES, RACE_LOCK_MS, RACE_SECONDS, STEPS, bitsToNumber, laptopCounted, matchesGoal, newRace,
-  numberToBits, numberToChar, pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
+  ADD_PLACES, GATES, RACE_LOCK_MS, RACE_SECONDS, STEPS, addColumns, bitsToNumber, fullAdder,
+  laptopCounted, matchesGoal, newRace, numberToBits, numberToChar, paperStages, paperText,
+  pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
 } from "../../web/computer-core.mjs";
+
+const fourBits = (number) => ADD_PLACES.map((place) => (number & place ? 1 : 0));
 
 const route = (state) => {
   const hops = hopsFor(state);
@@ -180,8 +183,8 @@ test("gates follow their truth tables", () => {
   assert.deepEqual(table.map(([a, b]) => GATES.or(a, b)), [false, true, true, true]);
 });
 
-test("the race comes after the gates and before the closing line", () => {
-  assert.deepEqual(STEPS, ["binary", "gates", "race", "close"]);
+test("the steps go bits, gates, adding on paper, adding in gates, the race, the closing line", () => {
+  assert.deepEqual(STEPS, ["binary", "gates", "paper", "adder", "race", "close"]);
 });
 
 test("the race clock starts at the first press, and late presses don't count", () => {
@@ -226,4 +229,48 @@ test("how much faster the laptop was reads naturally", () => {
   assert.equal(timesFaster(3, 5e9), "1.7 billion");
   assert.equal(timesFaster(1, 5e9), "5 billion");
   assert.equal(timesFaster(10, 25_000), "2,500");
+});
+
+test("the adder built from gates follows the rules of adding one column", () => {
+  for (const a of [0, 1]) for (const b of [0, 1]) for (const c of [0, 1]) {
+    const { sum, carry } = fullAdder(a, b, c);
+    assert.equal(sum + 2 * carry, a + b + c, `${a} + ${b} + ${c}`);
+  }
+});
+
+test("adding column by column gives the right answer for every pair of 4-switch numbers", () => {
+  for (let a = 0; a < 16; a++) {
+    for (let b = 0; b < 16; b++) {
+      const { columns, carry } = addColumns(fourBits(a), fourBits(b));
+      assert.deepEqual(columns.map((column) => column.place), [1, 2, 4, 8], "right to left");
+      const answer = columns.reduce((total, column) => total + column.sum * column.place, carry * 16);
+      assert.equal(answer, a + b, `${a} + ${b}`);
+    }
+  }
+  assert.equal(bitsToNumber(fourBits(13), ADD_PLACES), 13);
+});
+
+test("on paper, 6 + 7 goes one column at a time and shows each carry", () => {
+  const stages = paperStages(fourBits(6), fourBits(7));
+  assert.deepEqual(stages.map((stage) => stage.kind), ["start", "column", "column", "column", "column", "done"]);
+  const captions = stages.map((stage) => paperText(stage, 6, 7));
+  assert.deepEqual(captions.slice(1, 5).map((caption) => caption.title), [
+    "The 1s column: 0 + 1 = 1",
+    "The 2s column: 1 + 1 = 2",
+    "The 4s column: 1 + 1 + the carried 1 = 3",
+    "The 8s column: 0 + 0 + the carried 1 = 1",
+  ]);
+  assert.match(captions[2].text, /2 is written 10/);
+  assert.match(captions[3].text, /3 is written 11/);
+  assert.equal(captions.at(-1).title, "6 + 7 = 13");
+});
+
+test("on paper, a carry left over at the end becomes a 16s column", () => {
+  const stages = paperStages(fourBits(9), fourBits(8));
+  assert.deepEqual(stages.map((stage) => stage.kind), ["start", "column", "column", "column", "column", "carry", "done"]);
+  assert.equal(paperText(stages.at(-1), 9, 8).title, "9 + 8 = 17");
+  for (const stage of paperStages(fourBits(0), fourBits(0))) {
+    const { title, text } = paperText(stage, 0, 0);
+    assert.ok(title && text);
+  }
 });

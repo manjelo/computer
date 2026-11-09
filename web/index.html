@@ -95,7 +95,8 @@
       <div class="computer-steps">
         <span class="stage" data-step="binary">1. Only 0s and 1s</span>
         <span class="stage" data-step="gates">2. Making decisions</span>
-        <span class="stage" data-step="race close">3. The whole machine</span>
+        <span class="stage" data-step="paper adder">3. Doing math</span>
+        <span class="stage" data-step="race close">4. The whole machine</span>
       </div>
 
       <div id="binary-step" class="computer-body">
@@ -122,6 +123,23 @@
         <div class="gates">
           <div id="gate-and" class="gate-card"></div>
           <div id="gate-or" class="gate-card"></div>
+        </div>
+      </div>
+
+      <div id="paper-step" class="computer-body" hidden>
+        <p class="goal">Computers add like you do on paper, with only 0s and 1s</p>
+        <div id="paper-grid" class="paper"></div>
+        <div class="add-caption">
+          <p id="paper-caption-title" class="add-caption-title"></p>
+          <p id="paper-caption-text" class="add-caption-text"></p>
+        </div>
+      </div>
+
+      <div id="adder-step" class="computer-body" hidden>
+        <svg id="adder-map" class="adder-map" viewBox="0 0 1600 560" role="img" aria-label="A chain of four adders made of gates"></svg>
+        <div class="add-caption">
+          <p class="add-caption-title">Inside the chip, gates do the same sum</p>
+          <p class="add-caption-text">Each ADD box is a few gates like the AND and OR you just tried. The carry passes from box to box, right to left.</p>
         </div>
       </div>
 

@@ -2,6 +2,7 @@ import {
   GATES, PLACES, RACE_SECONDS, STEPS, bitsToNumber, laptopCounted, matchesGoal, newRace,
   numberToChar, pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
 } from "./computer-core.mjs";
+import { createAdding } from "./adding.js";
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -135,6 +136,7 @@ export function createComputerTrack() {
   }
 
   const resetGates = [createGate("and"), createGate("or")];
+  const adding = createAdding();
 
   // Race the computer: the student presses Space while a worker counts on one part of the chip.
   const raceTitle = document.getElementById("race-title");
@@ -227,24 +229,36 @@ export function createComputerTrack() {
     const from = STEPS[step];
     step = Math.max(0, Math.min(STEPS.length - 1, step + delta));
     const to = STEPS[step];
-    // Leaving mid-race calls it off. Arriving from the gates always starts a fresh race,
-    // while coming back from the closing line keeps the result.
-    if ((from === "race" && to !== "race" && race.phase === "running") || (from === "gates" && to === "race")) {
-      resetRace();
-    }
+    if (to === from) return;
+    // Leaving mid-race calls it off. Arriving at the race going forward always starts a fresh
+    // one, while coming back from the closing line keeps the result.
+    if ((from === "race" && race.phase === "running") || (to === "race" && delta > 0)) resetRace();
+    if (from === "adder") adding.leaveAdder();
+    if (to === "paper") adding.enterPaper(delta > 0);
+    if (to === "adder") adding.enterAdder();
     renderStep();
+  }
+
+  // On the paper screen, Next and Back go one column at a time before leaving the screen.
+  function next() {
+    if (!(STEPS[step] === "paper" && adding.paperNext())) move(1);
+  }
+
+  function previous() {
+    if (!(STEPS[step] === "paper" && adding.paperBack())) move(-1);
   }
 
   function resetAll() {
     bits = PLACES.map(() => 0);
     goal = null;
     resetGates.forEach((reset) => reset());
+    adding.reset();
     resetRace();
     renderBinary();
   }
 
-  document.getElementById("computer-next").addEventListener("click", () => move(1));
-  document.getElementById("computer-back").addEventListener("click", () => move(-1));
+  document.getElementById("computer-next").addEventListener("click", next);
+  document.getElementById("computer-back").addEventListener("click", previous);
   document.getElementById("computer-reset").addEventListener("click", resetAll);
   raceAgain.addEventListener("click", resetRace);
 
@@ -256,8 +270,8 @@ export function createComputerTrack() {
     onKey(key) {
       const name = STEPS[step];
       if (name === "race" && key === " ") spaceInRace();
-      else if (key === " " || key === "ArrowRight") move(1);
-      else if (key === "ArrowLeft") move(-1);
+      else if (key === " " || key === "ArrowRight") next();
+      else if (key === "ArrowLeft") previous();
       else if (key === "0") resetAll();
       else if (name === "race" && key.toLowerCase() === "r") resetRace();
       else if (name === "binary" && /^[a-zA-Z]$/.test(key)) {

@@ -2,8 +2,8 @@
 
 export const PLACES = [128, 64, 32, 16, 8, 4, 2, 1];
 
-export function bitsToNumber(bits) {
-  return bits.reduce((total, bit, index) => total + (bit ? PLACES[index] : 0), 0);
+export function bitsToNumber(bits, places = PLACES) {
+  return bits.reduce((total, bit, index) => total + (bit ? places[index] : 0), 0);
 }
 
 export function numberToBits(number) {
@@ -27,9 +27,73 @@ export function matchesGoal(bits, goal) {
 export const GATES = {
   and: (a, b) => a && b,
   or: (a, b) => a || b,
+  // "One or the other, but not both". Only used inside the adder, not shown as its own gate.
+  xor: (a, b) => a !== b,
 };
 
-export const STEPS = ["binary", "gates", "race", "close"];
+export const STEPS = ["binary", "gates", "paper", "adder", "race", "close"];
+
+// Doing math: two numbers of 4 switches each.
+export const ADD_PLACES = [8, 4, 2, 1];
+
+// One column of the sum, built from gates the way a chip does it: a "full adder".
+export function fullAdder(a, b, carryIn) {
+  const [x, y, c] = [a, b, carryIn].map(Boolean);
+  const oneOfTwo = GATES.xor(x, y);
+  return {
+    sum: Number(GATES.xor(oneOfTwo, c)),
+    carry: Number(GATES.or(GATES.and(x, y), GATES.and(oneOfTwo, c))),
+  };
+}
+
+// Columns from the right (the 1s) to the left, as a person adds on paper. `carry` is what is
+// left over at the end, which becomes the 16s digit.
+export function addColumns(aBits, bBits) {
+  const columns = [];
+  let carry = 0;
+  for (let index = aBits.length - 1; index >= 0; index--) {
+    const a = aBits[index];
+    const b = bBits[index];
+    const result = fullAdder(a, b, carry);
+    columns.push({ index, place: ADD_PLACES[index], a, b, carryIn: carry, total: a + b + carry, ...result });
+    carry = result.carry;
+  }
+  return { columns, carry };
+}
+
+// Each press of Space on the paper screen: one column at a time, then any last carry, then the answer.
+export function paperStages(aBits, bBits) {
+  const { columns, carry } = addColumns(aBits, bBits);
+  return [
+    { kind: "start" },
+    ...columns.map((column) => ({ kind: "column", column })),
+    ...(carry ? [{ kind: "carry" }] : []),
+    { kind: "done" },
+  ];
+}
+
+const COLUMN_RESULT = [
+  "Write 0.",
+  "Write 1.",
+  "In binary, 2 is written 10. Write 0 and carry the 1 to the next column.",
+  "In binary, 3 is written 11. Write 1 and carry the 1 to the next column.",
+];
+
+export function paperText(stage, a, b) {
+  switch (stage.kind) {
+    case "start":
+      return { title: "Pick two numbers with the switches", text: "Then add them one column at a time, starting from the right, just like on paper." };
+    case "column": {
+      const { place, a: x, b: y, carryIn, total } = stage.column;
+      const sum = carryIn ? `${x} + ${y} + the carried 1 = ${total}` : `${x} + ${y} = ${total}`;
+      return { title: `The ${place}s column: ${sum}`, text: COLUMN_RESULT[total] };
+    }
+    case "carry":
+      return { title: "The last carry starts a new column", text: "Nothing is left to add, so the 1 goes in the 16s column." };
+    default:
+      return { title: `${a} + ${b} = ${a + b}`, text: "The same answer you would get, using only 0s and 1s." };
+  }
+}
 
 // Race the computer: a student presses Space as fast as they can while the laptop counts.
 export const RACE_SECONDS = 5;

@@ -541,6 +541,59 @@ main { flex: 1; min-height: 0; display: flex; }
 .gate-lamp.on { fill: var(--lit); stroke: #a87400; }
 .gate-result { fill: var(--ink); font-family: var(--font); font-size: 26px; font-weight: 700; text-anchor: middle; }
 
+/* Doing math */
+.paper {
+  display: grid;
+  grid-template-columns: 13rem repeat(5, 6.2rem);
+  gap: 0.45rem 0.8rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.paper-label { padding-right: 0.6rem; font-size: 2rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.paper-carry-label { font-size: 1.3rem; font-weight: 600; color: var(--signal); }
+.paper-result { color: var(--good); }
+.paper-place { font-size: 1.3rem; font-weight: 700; color: var(--ink-soft); text-align: center; }
+.paper-place.current { color: var(--signal); }
+.paper-carry { min-height: 2.3rem; font-size: 1.9rem; font-weight: 800; color: var(--signal); text-align: center; }
+
+.paper-bit, .paper-sum {
+  height: 5rem;
+  border-radius: 0.5rem;
+  font-family: var(--mono);
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.paper-bit { border: 1px solid var(--line); background: var(--surface); }
+.paper-bit.on { border-color: var(--lit); background: #fff8e4; }
+.paper-sum { display: grid; place-items: center; font-weight: 800; }
+.paper-bit.current, .paper-sum.current { outline: 0.22rem solid var(--signal); outline-offset: 0.15rem; }
+.paper-rule { grid-column: 2 / -1; height: 0.25rem; border-radius: 0.15rem; background: var(--ink); }
+
+.add-caption {
+  min-height: 7.2rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.add-caption-title { font-size: 2.1rem; font-weight: 700; }
+.add-caption-text { margin-top: 0.25rem; font-size: 1.5rem; color: var(--ink-soft); }
+
+.adder-map { flex: 1; width: 100%; min-height: 0; }
+.adder-box rect { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 4; transition: fill 0.2s ease-out, stroke 0.2s ease-out; }
+.adder-box.working rect { fill: var(--signal-soft); stroke: var(--signal); }
+.adder-box text { fill: var(--blue); font-family: var(--font); font-size: 36px; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+.adder-lamp text { fill: var(--ink); font-family: var(--mono); font-size: 28px; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.adder-lamp.unknown text { fill: var(--ink-soft); }
+.adder-input { cursor: pointer; }
+.adder-label { fill: var(--ink-soft); font-family: var(--font); font-size: 22px; font-weight: 700; text-anchor: middle; }
+.adder-carry-label { fill: var(--signal); font-family: var(--font); font-size: 20px; font-weight: 600; text-anchor: middle; }
+.adder-legend { fill: var(--ink); font-family: var(--font); font-size: 36px; font-weight: 700; }
+.adder-result { fill: var(--good); font-family: var(--font); font-size: 46px; font-weight: 800; dominant-baseline: central; }
+
 .race-heading { display: flex; flex-direction: column; gap: 0.8rem; text-align: center; }
 .goal.race-won { color: var(--signal); }
 .race-hint { min-height: 1.3em; font-size: 1.9rem; color: var(--ink-soft); }
@@ -576,6 +629,6 @@ main { flex: 1; min-height: 0; display: flex; }
 .collect-note { font-size: 1.1rem; color: var(--ink-soft); }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar-fill, .dev-progress span, .dev-address, .dev-node, .dev-stack rect { transition: none; }
+  .bar-fill, .dev-progress span, .dev-address, .dev-node, .dev-stack rect, .adder-box rect { transition: none; }
   .page-spinner, .page-in { animation: none; }
 }
