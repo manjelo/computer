@@ -6,7 +6,7 @@ Three live demos for BAU Open Doors, shown fullscreen on the TV from one laptop.
 
     ./start.sh
 
-Wait about 20 seconds while the model's training shapes are prepared. It runs without internet. To close it, press `Alt+F4`, then `Ctrl+C` in the terminal.
+Wait about 15 seconds while the model's training shapes are prepared. It runs without internet. To close it, press `Alt+F4`, then `Ctrl+C` in the terminal.
 
 ## Presenter keys
 
@@ -27,12 +27,12 @@ Switch tracks with `1`, `2` and `3`.
 | | `M` | Mystery fault: a random stop breaks |
 | | `H` | Rush hour: the server overloads, then engineers add servers |
 | | `D` / `B` | Break DNS / the database on purpose (keys only, no button) |
-
-Each scenario key switches that scenario on, and pressing it again switches it off. Only one scenario runs at a time, and the app you picked stays the same.
 | **How a computer works** | any letter | Set the goal letter, such as the first letter of a student's name |
 | | `Space` or `→` | Next step |
 | | `←` | Back |
 | | `0` | All switches off |
+
+In Development, each scenario key switches that scenario on, and pressing it again switches it off. Only one scenario runs at a time, and the app you picked stays the same.
 
 ## Running each demo
 
@@ -54,6 +54,19 @@ With the app running, open <http://127.0.0.1:8000/collect>. Several team members
     .venv/bin/python -m ai.evaluate
 
 One drawing in five is kept out of training for this test. Aim for at least 90%. Drawings are saved in `data/team/`. Student drawings at the event are never saved, because the collect page is the only thing that writes to disk.
+
+Commit the drawings so they are kept with the code:
+
+    git add data/team && git commit -m "Add team drawings"
+
+## Setting it up on another laptop
+
+Copy the folder without `.venv` and `.browser-profile`, then, with internet:
+
+    python3 -m venv .venv
+    .venv/bin/pip install -r requirements.txt
+
+It needs Python 3.14 and Google Chrome.
 
 ## Tests
 

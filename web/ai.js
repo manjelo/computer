@@ -158,6 +158,9 @@ export function createAiTrack() {
       : "Not trained yet";
   }
 
+  // The server keeps the last drawing across a page reload, but the canvas starts blank.
+  post("/api/ai/drawing");
+
   const events = new EventSource("/api/ai/events");
   events.onmessage = (event) => {
     connection.hidden = true;

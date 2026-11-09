@@ -52,26 +52,35 @@
       prompt.textContent = `Draw a ${SHAPES[turn % SHAPES.length]} with the mouse`;
     }
 
+    let saving = false;
+
     async function save() {
-      const response = await fetch(`/api/collect/${SHAPES[turn % SHAPES.length]}`, {
-        method: "POST",
-        body: await pen.toPng(),
-      });
-      message.hidden = response.ok;
-      if (!response.ok) {
-        message.textContent = "Draw the shape first.";
-        return;
+      // A second Enter before this one finishes would save the same drawing twice.
+      if (saving) return;
+      saving = true;
+      try {
+        const response = await fetch(`/api/collect/${SHAPES[turn % SHAPES.length]}`, {
+          method: "POST",
+          body: await pen.toPng(),
+        });
+        message.hidden = response.ok;
+        if (!response.ok) {
+          message.textContent = "Draw the shape first.";
+          return;
+        }
+        showCounts(await response.json());
+        pen.clear();
+        turn++;
+        showPrompt();
+      } finally {
+        saving = false;
       }
-      showCounts(await response.json());
-      pen.clear();
-      turn++;
-      showPrompt();
     }
 
     document.getElementById("save").addEventListener("click", save);
     document.getElementById("clear").addEventListener("click", () => pen.clear());
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") { event.preventDefault(); save(); }
+      if (event.key === "Enter") { event.preventDefault(); if (!event.repeat) save(); }
       if (event.key.toLowerCase() === "c") pen.clear();
     });
 

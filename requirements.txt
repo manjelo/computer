@@ -1,0 +1,14 @@
+# Python 3.14. Install with:
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# The extra index gives the CPU-only build of torch, which is much smaller.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+fastapi==0.162.0
+uvicorn==0.54.0
+torch==2.15.0+cpu
+numpy==2.5.4
+pillow==13.0.0
+
+# Tests
+pytest==9.2.0
+httpx==0.28.1
