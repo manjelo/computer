@@ -608,9 +608,87 @@ main { flex: 1; min-height: 0; display: flex; }
 .race-number { font-size: 4.6rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .race-card.laptop .race-number { color: var(--signal); }
 
-.close-body { align-items: center; justify-content: center; gap: 2rem; text-align: center; }
-.closing { max-width: 62rem; font-size: 3.6rem; font-weight: 800; line-height: 1.18; color: var(--blue); }
-.closing-sub { font-size: 1.9rem; color: var(--ink-soft); }
+/* The whole machine */
+.machine-body { justify-content: flex-start; gap: 0.7rem; }
+.machine { flex: 1; min-height: 0; display: grid; grid-template-columns: 21rem minmax(0, 1fr); gap: 1rem; }
+.machine-tasks { display: flex; flex-direction: column; gap: 0.6rem; padding: 1rem 1.1rem; }
+.task-list { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.task { display: grid; grid-template-columns: 1.3rem 1fr; gap: 0 0.5rem; padding: 0.4rem 0.6rem; border-radius: 0.35rem; font-size: 1.15rem; color: var(--ink-soft); }
+.task-mark { font-weight: 700; }
+.task-steps { grid-column: 2; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.task-steps:empty { display: none; }
+.task.running { background: var(--signal-soft); color: var(--ink); font-weight: 700; }
+.task.running .task-mark { color: var(--signal); }
+.task.done { color: var(--ink); }
+.task.done .task-mark { color: var(--good); }
+.machine-count { margin-top: auto; font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.machine-map { width: 100%; height: 100%; min-height: 0; }
+.machine-phase { min-height: 1.3em; font-size: 1.45rem; font-weight: 600; text-align: center; }
+
+.closing-bar { text-align: center; }
+.closing { font-size: 1.9rem; font-weight: 800; line-height: 1.2; color: var(--blue); }
+.closing-sub { margin-top: 0.2rem; font-size: 1.3rem; color: var(--ink-soft); }
+
+/* Parts of the machine, drawn in SVG units. "hot" means in use this moment: it lights at once
+   and fades out, so busy parts glow and idle ones go quiet. */
+.m-box { fill: var(--surface); stroke: var(--blue); stroke-width: 3; transition: stroke 0.35s ease-out; }
+.m-box.hot { stroke: var(--signal); transition: none; }
+.m-box-screen { fill: #14202f; }
+.m-wire { stroke: var(--line); stroke-width: 10; stroke-linecap: round; transition: stroke 0.35s ease-out; }
+.m-seg { stroke-width: 14; }
+.m-wire.hot { stroke: var(--lit); transition: none; }
+.m-bus { stroke: var(--line); stroke-width: 14; stroke-linecap: round; }
+.m-bus-label { fill: var(--ink-soft); font-family: var(--font); font-size: 16px; font-weight: 600; text-anchor: end; }
+
+.m-title { fill: var(--ink); font-family: var(--font); font-size: 26px; font-weight: 800; }
+.m-title-small { font-size: 18px; }
+.m-sub { fill: var(--ink-soft); font-family: var(--font); font-size: 15px; }
+.m-small { fill: var(--ink-soft); font-family: var(--font); font-size: 14px; }
+.m-label { fill: var(--ink-soft); font-family: var(--font); font-size: 15px; font-weight: 700; }
+.m-inner { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; transition: stroke 0.35s ease-out; }
+.m-alu.hot { stroke: var(--signal); stroke-width: 2.5; transition: none; }
+.m-clock { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 2; transition: fill 0.2s ease-out; }
+.m-clock.hot { fill: var(--lit); transition: none; }
+
+.m-pill rect { fill: var(--blue-soft); transition: fill 0.3s ease-out; }
+.m-pill text { fill: var(--ink-soft); font-family: var(--font); font-size: 11px; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+.m-pill.hot rect { fill: var(--blue); transition: none; }
+.m-pill.hot text { fill: #fff; }
+.m-op { fill: var(--ink); font-family: var(--mono); font-size: 22px; font-weight: 700; }
+
+.m-reg-label { fill: var(--ink); font-family: var(--font); font-size: 14px; font-weight: 700; }
+.m-reg-bit { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.m-reg-bit.on { fill: var(--lit); stroke: #a87400; }
+.m-reg-value { fill: var(--ink); font-family: var(--mono); font-size: 16px; font-weight: 700; text-anchor: end; }
+
+.m-adder { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.m-gate { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.4; }
+.m-gate.on { fill: var(--lit); stroke: #a87400; }
+.m-carry { stroke: var(--line); stroke-width: 3; }
+.m-carry.on { stroke: var(--lit); }
+.m-alu-text { font-family: var(--mono); font-weight: 700; fill: var(--ink); }
+
+.m-ram-bit.program { fill: var(--blue-soft); }
+.m-ram-bit.data { fill: var(--good-soft); }
+.m-ram-bit.program.on { fill: var(--blue); }
+.m-ram-bit.data.on { fill: var(--good); }
+.m-byte { fill: none; stroke: transparent; stroke-width: 2.5; transition: stroke 0.35s ease-out; }
+.m-byte.hot { stroke: var(--signal); transition: none; }
+
+.m-file rect { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 1.5; }
+.m-file text { fill: var(--ink-soft); font-family: var(--mono); font-size: 16px; }
+.m-file.current rect { fill: var(--signal); stroke: var(--signal); }
+.m-file.current text { fill: var(--ink); font-weight: 700; }
+
+.m-screen-title { fill: #c7d3e2; font-family: var(--font); font-size: 15px; font-weight: 700; text-anchor: middle; }
+.m-pixel { fill: #23344a; }
+.m-pixel.on { fill: var(--lit); }
+.m-display { fill: #14202f; }
+.m-display-value { fill: var(--lit); font-family: var(--mono); font-size: 60px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.m-speed { fill: var(--ink-soft); font-family: var(--font); font-size: 16px; }
+
+.m-packet rect { fill: var(--signal); }
+.m-packet text { fill: #fff; font-family: var(--mono); font-size: 16px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
 
 /* Team collection page */
 .collect {
@@ -629,6 +707,7 @@ main { flex: 1; min-height: 0; display: flex; }
 .collect-note { font-size: 1.1rem; color: var(--ink-soft); }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar-fill, .dev-progress span, .dev-address, .dev-node, .dev-stack rect, .adder-box rect { transition: none; }
+  .bar-fill, .dev-progress span, .dev-address, .dev-node, .dev-stack rect, .adder-box rect,
+  .m-box, .m-wire, .m-inner, .m-clock, .m-pill rect, .m-byte { transition: none; }
   .page-spinner, .page-in { animation: none; }
 }

@@ -164,9 +164,20 @@
         </div>
       </div>
 
-      <div id="close-step" class="computer-body close-body" hidden>
-        <p class="closing">Billions of these switches make up the chip that just trained the AI and sent your packet.</p>
-        <p class="closing-sub">Computer engineers work on all of it, from the switches to the software.</p>
+      <div id="close-step" class="computer-body machine-body" hidden>
+        <div class="machine">
+          <aside class="panel machine-tasks">
+            <h2>Tasks</h2>
+            <ol id="machine-task-list" class="task-list"></ol>
+            <p id="machine-count" class="machine-count"></p>
+          </aside>
+          <svg id="machine-map" class="machine-map" viewBox="0 0 1280 640" role="img" aria-label="A tiny computer running: CPU, memory, storage, screen and number display joined by a bus"></svg>
+        </div>
+        <p id="machine-phase" class="machine-phase" hidden></p>
+        <div class="closing-bar">
+          <p class="closing">Billions of these switches make up the chip that just trained the AI and sent your packet.</p>
+          <p class="closing-sub">Computer engineers work on all of it, from the switches to the software.</p>
+        </div>
       </div>
 
       <footer class="keys">
@@ -174,6 +185,7 @@
         <button id="computer-back" class="key-button"><kbd>&larr;</kbd>Back</button>
         <button id="computer-reset" class="key-button"><kbd>0</kbd>All switches off</button>
         <button id="race-again" class="key-button" hidden><kbd>R</kbd>Race again</button>
+        <button id="machine-slow" class="key-button" aria-pressed="false" hidden><kbd>S</kbd>Slow motion</button>
         <span id="computer-note" class="key-note">Press any letter to set the goal</span>
       </footer>
     </section>

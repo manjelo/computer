@@ -222,6 +222,9 @@ export function createAdding() {
   renderAdder();
 
   return {
+    values() {
+      return { a: value("a"), b: value("b") };
+    },
     // Arriving from the gates starts the sum from the first column; coming back keeps the answer.
     enterPaper(fresh) {
       if (fresh) stage = 0;

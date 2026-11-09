@@ -3,6 +3,7 @@ import {
   numberToChar, pressSpace, secondsLeft, spaceMovesOn, sumText, timesFaster,
 } from "./computer-core.mjs";
 import { createAdding } from "./adding.js";
+import { createMachine } from "./machine.js";
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -138,6 +139,16 @@ export function createComputerTrack() {
   const resetGates = [createGate("and"), createGate("or")];
   const adding = createAdding();
 
+  // The last screen runs the students' own sum and letter, or an example if they skipped them.
+  const slowButton = document.getElementById("machine-slow");
+  const machine = createMachine({
+    inputs() {
+      const { a, b } = adding.values();
+      const picked = a > 0 || b > 0;
+      return { a: picked ? a : 6, b: picked ? b : 7, letter: goal ?? "A" };
+    },
+  });
+
   // Race the computer: the student presses Space while a worker counts on one part of the chip.
   const raceTitle = document.getElementById("race-title");
   const raceHint = document.getElementById("race-hint");
@@ -220,6 +231,7 @@ export function createComputerTrack() {
     for (const other of STEPS) document.getElementById(`${other}-step`).hidden = other !== name;
     document.getElementById("computer-note").hidden = name !== "binary";
     raceAgain.hidden = name !== "race";
+    slowButton.hidden = name !== "close";
     for (const pill of document.querySelectorAll(".computer-steps .stage")) {
       pill.classList.toggle("active", pill.dataset.step.split(" ").includes(name));
     }
@@ -236,7 +248,14 @@ export function createComputerTrack() {
     if (from === "adder") adding.leaveAdder();
     if (to === "paper") adding.enterPaper(delta > 0);
     if (to === "adder") adding.enterAdder();
+    // The machine only runs while it is on screen, and starts with the students' latest numbers.
+    if (from === "close") machine.stop();
+    if (to === "close") machine.start();
     renderStep();
+  }
+
+  function toggleSlowMotion() {
+    slowButton.setAttribute("aria-pressed", String(machine.toggleSlow()));
   }
 
   // On the paper screen, Next and Back go one column at a time before leaving the screen.
@@ -261,6 +280,7 @@ export function createComputerTrack() {
   document.getElementById("computer-back").addEventListener("click", previous);
   document.getElementById("computer-reset").addEventListener("click", resetAll);
   raceAgain.addEventListener("click", resetRace);
+  slowButton.addEventListener("click", toggleSlowMotion);
 
   renderBinary();
   renderRace();
@@ -274,6 +294,7 @@ export function createComputerTrack() {
       else if (key === "ArrowLeft") previous();
       else if (key === "0") resetAll();
       else if (name === "race" && key.toLowerCase() === "r") resetRace();
+      else if (name === "close" && key.toLowerCase() === "s") toggleSlowMotion();
       else if (name === "binary" && /^[a-zA-Z]$/.test(key)) {
         goal = key.toUpperCase();
         bits = PLACES.map(() => 0);

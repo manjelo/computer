@@ -36,14 +36,25 @@ export const STEPS = ["binary", "gates", "paper", "adder", "race", "close"];
 // Doing math: two numbers of 4 switches each.
 export const ADD_PLACES = [8, 4, 2, 1];
 
-// One column of the sum, built from gates the way a chip does it: a "full adder".
-export function fullAdder(a, b, carryIn) {
+// One column of the sum, built from five gates the way a chip does it: a "full adder".
+// Returns what each gate outputs, so the machine on the last screen can light them up.
+export function fullAdderGates(a, b, carryIn) {
   const [x, y, c] = [a, b, carryIn].map(Boolean);
   const oneOfTwo = GATES.xor(x, y);
+  const both = GATES.and(x, y);
+  const carried = GATES.and(oneOfTwo, c);
   return {
+    oneOfTwo: Number(oneOfTwo),
+    both: Number(both),
+    carried: Number(carried),
     sum: Number(GATES.xor(oneOfTwo, c)),
-    carry: Number(GATES.or(GATES.and(x, y), GATES.and(oneOfTwo, c))),
+    carry: Number(GATES.or(both, carried)),
   };
+}
+
+export function fullAdder(a, b, carryIn) {
+  const { sum, carry } = fullAdderGates(a, b, carryIn);
+  return { sum, carry };
 }
 
 // Columns from the right (the 1s) to the left, as a person adds on paper. `carry` is what is

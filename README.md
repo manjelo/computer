@@ -31,6 +31,7 @@ Switch tracks with `1`, `2` and `3`.
 | | `Space` or `→` | Next step. When adding on paper, one column at a time. In the race, `Space` is the student's key and `→` skips the race |
 | | `←` | Back, one column at a time when adding on paper |
 | | `R` | Race again, for the next student |
+| | `S` | On the last screen, slow motion on or off |
 | | `0` | All switches off, including the two numbers being added, and a fresh race |
 
 In Development, each scenario key switches that scenario on, and pressing it again switches it off. Only one scenario runs at a time, and the app you picked stays the same.
@@ -50,7 +51,9 @@ In Development, each scenario key switches that scenario on, and pressing it aga
 
 Press `Space` for Doing math. Students pick two numbers from 0 to 15 by clicking the switches. Each `Space` adds one column, from right to left, and shows any carry, until the answer appears. The next `Space` shows the same sum in a chain of adders made of gates, with the carry passing from box to box. Students can click the A and B lamps there to change the numbers.
 
-Press `Space` for the race against the laptop. The student presses `Space` as fast as they can. The 5-second clock starts at their first press, and the laptop counts on one part of its chip at the same time. The result stays up, and `Space` does nothing for 2 seconds so a student still pressing can't skip it. Press `R` for another student, or `Space` for the closing line.
+Press `Space` for the race against the laptop. The student presses `Space` as fast as they can. The 5-second clock starts at their first press, and the laptop counts on one part of its chip at the same time. The result stays up, and `Space` does nothing for 2 seconds so a student still pressing can't skip it. Press `R` for another student, or `Space` for the last screen.
+
+The last screen is a tiny computer that really runs, with the closing line under it. It has a CPU with a control unit, registers and an ALU (8 adders, 40 gates), plus memory, storage, a screen and a number display, all on one bus. It loops through six tasks: add the students' two numbers, multiply them by repeated adding, count to 99, show the student's letter, draw a smiley, and sort 8 bars by length. Without inputs, it uses 6 and 7 and the letter A. Parts light up as they work, and the memory shows the program itself as 0s and 1s. It runs at 160 steps a second. Press `S` for slow motion: one fetch, decode or execute at a time, each explained in a sentence. Press `S` again for full speed.
 
 ## Before the event: improve the model with real drawings
 
