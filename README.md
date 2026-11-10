@@ -84,3 +84,4 @@ It needs Python 3.14 and Google Chrome.
 ## Poster
 
 `poster/poster.pdf` is A1. To rebuild it after editing `poster/poster.tex`, run `pdflatex poster.tex` twice in that folder, as one run gives a blank page.
+# computer
